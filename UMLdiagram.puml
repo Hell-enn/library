@@ -1,0 +1,337 @@
+@startuml
+class com.library.library.genrebook.GenreBookDto {
+- Long id
+- GenreDto genreDto
+- BookShortDto bookShortDto
+}
+
+class com.library.library.member.MemberDto {
+- Long id
+- String email
+- String phoneNumber
+- String lastName
+- String firstName
+}
+
+interface com.library.library.genre.GenreRepository {
+~ List<Long> findExistingIds(List<Long>)
+~ List<Genre> findByTransactionId(Long)
+}
+
+class com.library.library.author.Author {
+- Long id
+- String firstName
+- String lastName
+- LocalDate birthDate
+}
+
+class com.library.library.member.MemberController {
+- MemberService memberServiceImpl
++ ResponseEntity<Object> signInMember(MemberDto)
++ ResponseEntity<Object> logInMember(String)
++ ResponseEntity<Object> authorizeMember(String)
+}
+
+
+interface com.library.library.member.MemberService {
+~ MemberDto signInMember(MemberDto)
+~ MemberDto logInMember(String)
+~ MemberDto authorizeMember(String,Long)
+}
+
+class com.library.library.transaction.BorrowingBookTransactionMapper {
+- BookMapper bookMapper
+- MemberMapper memberMapper
++ BorrowingBookTransaction transactionDtoToTransactionEntity(BorrowingBookTransactionDto)
++ BorrowingBookTransactionDto transactionEntityToTransactionDto(BorrowingBookTransaction,List<GenreDto>)
+}
+
+
+class com.library.library.transaction.BorrowingBookTransaction {
+- Long id
+- LocalDateTime bookingDate
+- LocalDate plannedStartDate
+- LocalDate plannedEndDate
+- LocalDateTime actualReturnDate
+- Book book
+- Member member
+}
+
+class com.library.library.transaction.BorrowingBookTransactionServiceImpl {
+- BorrowingBookTransactionRepository borrowingBookTransactionRepository
+- MemberRepository memberRepository
+- GenreRepository genreRepository
+- BorrowingBookTransactionMapper borrowingBookTransactionMapper
+- BookMapper bookMapper
+- MemberMapper memberMapper
+- GenreMapper genreMapper
++ BorrowingBookTransactionDto borrowObject(BorrowingBookTransactionDto)
++ BorrowingBookTransactionDto borrowObjectWithExistingBooking(Long,Long)
++ BorrowingBookTransactionDto returnObject(Long,Long)
+- List<GenreDto> getGenreDtosForTransaction(Long)
+}
+
+
+class com.library.library.exceptions.BadRequestException {
+}
+class com.library.library.genre.GenreDto {
+- Long id
+- String title
+- String description
+}
+
+class com.library.library.email.impl.EmailServiceImpl {
+- JavaMailSender emailSender
++ void sendNotificationEmail(String,String,String)
+}
+
+
+interface com.library.library.book.BookService {
+~ BookDto addBook(BookDto)
+}
+
+interface com.library.library.member.AuthorizationCodeRepository {
+~ Optional<AuthorizationCode> findByRandomCodeAndMemberId(String,Long)
+}
+
+class com.library.library.email.impl.EmailCreationServiceImpl {
+- EmailService emailService
+- BorrowingBookTransactionRepository borrowingObjectTransactionRepository
++ void createDebtorMail()
++ String createLogInMail(String)
+- String createRandomCode()
+}
+
+
+class com.library.library.member.MemberServiceImpl {
+- MemberRepository memberRepository
+- AuthorizationCodeRepository authorizationCodeRepository
+- MemberMapper memberMapper
+- EmailCreationService emailCreationServiceImpl
++ MemberDto signInMember(MemberDto)
++ MemberDto logInMember(String)
++ MemberDto authorizeMember(String,Long)
+}
+
+
+interface com.library.library.genrebook.GenreBookRepository {
+}
+class com.library.library.book.BookMapper {
+- AuthorMapper authorMapper
+- GenreMapper genreMapper
++ Book bookDtoToBookEntity(BookDto)
++ BookDto bookEntityToBookDto(Book,List<GenreDto>)
++ BookShortDto bookEntityToBookShortDto(Book)
++ Book bookShortDtoToBookEntity(BookShortDto)
+}
+
+
+class com.library.library.book.BookShortDto {
+- String title
+- String isbn
+- AuthorDto authorDto
+- LocalDate publicationDate
+}
+
+interface com.library.library.email.EmailService {
+~ void sendNotificationEmail(String,String,String)
+}
+
+class com.library.library.member.Member {
+- Long id
+- String email
+- String phoneNumber
+- String lastName
+- String firstName
+}
+
+class com.library.library.transaction.BorrowingBookTransactionController {
+- BorrowingObjectTransactionService borrowingBookTransactionServiceImpl
++ ResponseEntity<Object> postBorrowing(BorrowingBookTransactionDto)
++ ResponseEntity<Object> patchBorrowingTake(Long,Long)
++ ResponseEntity<Object> patchBorrowingReturn(Long,Long)
+}
+
+
+class com.library.library.exceptions.NotFoundException {
+}
+interface com.library.library.email.EmailCreationService {
+~ void createDebtorMail()
+~ String createLogInMail(String)
+}
+
+class com.library.library.author.AuthorMapper {
++ Author authorDtoToAuthorEntity(AuthorDto)
++ AuthorDto authorEntityToAuthorDto(Author)
++ List<Author> authorDtoToAuthorEntityList(Page<AuthorDto>)
++ List<AuthorDto> authorEntityToAuthorDtoList(Page<Author>)
++ void updateAuthor(Author,AuthorDto)
+}
+
+class com.library.library.genrebook.GenreBookMapper {
+- GenreMapper genreMapper
+- BookMapper bookMapper
++ GenreBook genreBookDtoToGenreBookEntity(GenreBookDto)
++ GenreBookDto genreBookEntityToGenreBookDto(GenreBook)
+}
+
+
+class com.library.library.book.BookServiceImpl {
+- BookRepository bookRepository
+- GenreRepository genreRepository
+- GenreBookRepository genreBookRepository
+- BookMapper bookMapper
+- GenreMapper genreMapper
++ BookDto addBook(BookDto)
+}
+
+
+class com.library.library.LibraryApplication {
++ {static} void main(String[])
+}
+
+class com.library.library.transaction.BorrowingBookTransactionDto {
+- Long id
+- LocalDateTime bookingDate
+- LocalDate plannedStartDate
+- LocalDate plannedEndDate
+- LocalDateTime actualReturnDate
+- BookDto bookDto
+- MemberDto memberDto
+}
+
+interface com.library.library.book.BookRepository {
+}
+class com.library.library.author.AuthorDto {
+- Long id
+- String firstName
+- String lastName
+- LocalDate birthDate
+}
+
+class com.library.library.exceptions.ErrorHandler {
++ ResponseEntity<Object> handleBadRequest(BadRequestException)
++ ResponseEntity<Object> handleNotFound(NotFoundException)
++ ResponseEntity<Object> handleConflict(ConflictException)
++ ResponseEntity<Object> handleForbidden(ForbiddenException)
++ ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException)
++ ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException)
++ ResponseEntity<Object> handleUnsupportedOperationException(UnsupportedOperationException)
++ ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException)
++ ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException)
++ ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException)
++ ResponseEntity<Object> handleJsonProcessingExceptionException(JsonProcessingException)
+}
+
+interface com.library.library.author.AuthorRepository {
+~ int findAuthorsAmount()
+}
+
+interface com.library.library.transaction.BorrowingObjectTransactionService {
+~ BorrowingBookTransactionDto borrowObject(BorrowingBookTransactionDto)
+~ BorrowingBookTransactionDto borrowObjectWithExistingBooking(Long,Long)
+~ BorrowingBookTransactionDto returnObject(Long,Long)
+}
+
+class com.library.library.book.BookDto {
+- Long id
+- String title
+- String isbn
+- AuthorDto authorDto
+- LocalDate publicationDate
+~ List<GenreDto> genreDtoList
+}
+
+interface com.library.library.transaction.BorrowingBookTransactionRepository {
+~ Optional<BorrowingBookTransaction> findBookingByDates(LocalDate,LocalDate)
+~ Optional<BorrowingBookTransaction> findBookingByTransactionAndUser(LocalDate,LocalDate)
+~ List<Member> findDebtorsTransactions(LocalDate)
+}
+
+class com.library.library.member.MemberMapper {
++ Member memberDtoToMemberEntity(MemberDto)
++ MemberDto memberEntityToMemberDto(Member)
+}
+
+class com.library.library.exceptions.ApiError {
+~ List<String> errors
+~ String message
+~ String reason
+~ String status
+~ LocalDateTime timestamp
+}
+
+class com.library.library.exceptions.ForbiddenException {
+}
+class com.library.library.book.BookController {
+- BookService bookServiceImpl
++ ResponseEntity<Object> postBook(BookDto)
+}
+
+
+class com.library.library.genre.Genre {
+- Long id
+- String title
+- String description
+}
+
+class com.library.library.exceptions.ConflictException {
+}
+class com.library.library.genre.GenreMapper {
++ Genre genreDtoToGenreEntity(GenreDto)
++ GenreDto genreEntityToGenreDto(Genre)
++ List<Genre> genreDtoToGenreEntityList(List<GenreDto>)
++ List<GenreDto> genreEntityToGenreDtoList(List<Genre>)
+}
+
+class com.library.library.member.AuthorizationCode {
+- Long id
+- Member member
+- String randomCode
+}
+
+interface com.library.library.member.MemberRepository {
+~ Optional<Member> findByEmailOrPhoneNumber(String,String)
+~ Optional<Member> findByEmail(String)
+}
+
+class com.library.library.book.Book {
+- Long id
+- String title
+- String isbn
+- Author author
+- LocalDate publicationDate
+}
+
+class com.library.library.genrebook.GenreBook {
+- Long id
+- Genre genre
+- Book book
+}
+
+
+
+org.springframework.data.repository.PagingAndSortingRepository <|-- com.library.library.genre.GenreRepository
+org.springframework.data.repository.CrudRepository <|-- com.library.library.genre.GenreRepository
+com.library.library.transaction.BorrowingObjectTransactionService <|.. com.library.library.transaction.BorrowingBookTransactionServiceImpl
+com.library.library.exceptions.RuntimeException <|-- com.library.library.exceptions.BadRequestException
+com.library.library.email.EmailService <|.. com.library.library.email.impl.EmailServiceImpl
+org.springframework.data.repository.PagingAndSortingRepository <|-- com.library.library.member.AuthorizationCodeRepository
+org.springframework.data.repository.CrudRepository <|-- com.library.library.member.AuthorizationCodeRepository
+com.library.library.email.EmailCreationService <|.. com.library.library.email.impl.EmailCreationServiceImpl
+com.library.library.member.MemberService <|.. com.library.library.member.MemberServiceImpl
+org.springframework.data.repository.PagingAndSortingRepository <|-- com.library.library.genrebook.GenreBookRepository
+org.springframework.data.repository.CrudRepository <|-- com.library.library.genrebook.GenreBookRepository
+com.library.library.exceptions.RuntimeException <|-- com.library.library.exceptions.NotFoundException
+com.library.library.book.BookService <|.. com.library.library.book.BookServiceImpl
+org.springframework.data.repository.PagingAndSortingRepository <|-- com.library.library.book.BookRepository
+org.springframework.data.repository.CrudRepository <|-- com.library.library.book.BookRepository
+org.springframework.data.repository.PagingAndSortingRepository <|-- com.library.library.author.AuthorRepository
+org.springframework.data.repository.CrudRepository <|-- com.library.library.author.AuthorRepository
+org.springframework.data.repository.PagingAndSortingRepository <|-- com.library.library.transaction.BorrowingBookTransactionRepository
+org.springframework.data.repository.CrudRepository <|-- com.library.library.transaction.BorrowingBookTransactionRepository
+com.library.library.exceptions.RuntimeException <|-- com.library.library.exceptions.ForbiddenException
+com.library.library.exceptions.RuntimeException <|-- com.library.library.exceptions.ConflictException
+org.springframework.data.repository.PagingAndSortingRepository <|-- com.library.library.member.MemberRepository
+org.springframework.data.repository.CrudRepository <|-- com.library.library.member.MemberRepository
+@enduml
